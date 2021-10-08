@@ -84,15 +84,17 @@ config:
         queue_length: 0
         start_iter: 0
   OPTIMIZER:
-      name: sgd
-      use_larc: True
-      larc_config:
-        clip: False
-        trust_coefficient: 0.001
-        eps: 0.00000001
-      weight_decay: 0.000001
-      momentum: 0.9
-      nesterov: False
+      name: zero
+      base_optimizer:
+        name: sgd
+        use_larc: True
+        larc_config:
+          clip: False
+          trust_coefficient: 0.001
+          eps: 0.00000001
+        weight_decay: 0.000001
+        momentum: 0.9
+        nesterov: False
       # num_epochs: 100
       # num_epochs: 200
       num_epochs: 400
