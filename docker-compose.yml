@@ -1,0 +1,16 @@
+version: '2.3'
+services:
+  vissl:
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    build:
+      context: .
+      dockerfile: ./docker/vissl/Dockerfile
+      args:
+        - USER_ID=${UID}
+    volumes:
+      - .:/home/vissluser/workspace
+      - /mnt/D/Data/danbooru/resized:/home/vissluser/workspace/data/danbooru
+    working_dir: /home/vissluser/workspace
+    shm_size: '16gb'
