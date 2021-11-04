@@ -21,7 +21,11 @@ from vissl.utils.slurm import is_submitit_available
 
 from vissl.data.dataset_catalog import VisslDatasetCatalog
 
-VisslDatasetCatalog.register_data(name="danbooru2020", data_dict={"train": ['/home/vissluser/workspace/filelists/train_filelist.npy', '<unused>'] , "test": ['/home/vissluser/workspace/filelists/test_filelist.npy', '<unused>']})
+VisslDatasetCatalog.register_data(
+    name="danbooru2020",
+    data_dict={
+        "train": ['/home/vissluser/workspace/filelists/train_filelist.npy', '<unused>'] ,
+        "test": ['/home/vissluser/workspace/filelists/test_filelist.npy', '<unused>']})
 
 def hydra_main(overrides: List[Any]):
     ######################################################################################
