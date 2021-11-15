@@ -56,7 +56,7 @@ def prepair_model(args):
             temp_ckpt_files = [path for path in glob.glob(os.path.join(args.checkpoint_folder, '*.torch')) if 'phase' in path]
             # find latest by phase number
             number = re.compile('[0-9]+')
-            phase_int = [int(number.search(path).group(0)) for path in temp_ckpt_files]
+            phase_int = [int(number.search(os.path.basename(path)).group(0)) for path in temp_ckpt_files]
             latest_ckpt = temp_ckpt_files[phase_int.index(max(phase_int))]
             args.weights = latest_ckpt
         # if only one of train-config or weights are provided, abort.
