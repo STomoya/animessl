@@ -8,7 +8,7 @@ services:
       context: .
       dockerfile: ./docker/vissl/Dockerfile
       args:
-        - USER_ID=${UID}
+        - USER_ID=${USERID}
     volumes:
       - .:/home/vissluser/workspace
       - /mnt/D/Data/danbooru/resized:/home/vissluser/workspace/data/danbooru
