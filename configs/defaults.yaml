@@ -268,6 +268,9 @@ config:
       # generate gray images or random images (only makes an effect if the
       # data source is synthetic)
       RANDOM_SYNTHETIC_IMAGES: False
+      # how many different labels we want for the synthetic dataset
+      # only useful for testing
+      RANDOM_SYNTHETIC_LABELS: 0
       # number of unique samples in minibatch per gpu (or per device)
       BATCHSIZE_PER_REPLICA: 256
       # list of data transforms to apply on the data
@@ -387,6 +390,7 @@ config:
       MMAP_MODE: True
       DEFAULT_GRAY_IMG_SIZE: 224
       RANDOM_SYNTHETIC_IMAGES: False
+      RANDOM_SYNTHETIC_LABELS: 0
       BATCHSIZE_PER_REPLICA: 256
       TRANSFORMS: []
       COLLATE_FUNCTION: "default_collate"
@@ -552,6 +556,11 @@ config:
       # parameters that serves as threshold to decide if a layer is "big"
       AUTO_WRAP_THRESHOLD: 0
       AMP_TYPE: "01"
+      # Whether or not to force synchronize between layers:
+      # Useful for debugging memory issues with FSDP, beware that setting
+      # this flag will disable asynchronous overlap of communication and
+      # computation, decreasing performance sometimes significantly
+      FORCE_SYNC_CUDA: False
       # Parameters of fairscale FSDP
       flatten_parameters: True
       mixed_precision: True
@@ -578,6 +587,8 @@ config:
       # if we want to evaluate the full model, this requires loading the head weights as well
       # from model weights file. In this case, set the following to True.
       EVAL_TRUNK_AND_HEAD: False
+      # whether to assert that the head layers shape matches exactly
+      ASSERT_HEAD_LAYER_SHAPE_INIT: True
       # whether features should be flattened to result in N x D feature shape
       SHOULD_FLATTEN_FEATS: True
       # model features that should be evaluated for linear classification and what
@@ -624,6 +635,14 @@ config:
         # for the pixel-wise task. Torchvision default is stride=2 and all other models
         # use this so we set the default as 2.
         LAYER4_STRIDE: 2
+
+      # ------------------------------------------------------------- #
+      # SimCLR-v2 ResNet params that includes selective kernel
+      # ------------------------------------------------------------- #
+      RESNETS_SK:
+        DEPTH: 152
+        WIDTH_MULTIPLIER: 3
+        SK_RATIO: 0.0625
 
       # ------------------------------------------------------------- #
       # EfficientNet params
@@ -675,6 +694,7 @@ config:
         HIDDEN_DIM: 384
         NUM_LAYERS: 12
         NUM_HEADS: 8
+        MLP_RATIO: 4.0
         DROPOUT_RATE: 0
         ATTENTION_DROPOUT_RATE: 0
         DROP_PATH_RATE: 0.05
@@ -682,6 +702,34 @@ config:
         TOKENS_NORM: True
         QKV_BIAS: True # Bias for QKV in attention layers.
         QK_SCALE: False # Scale
+
+      # ------------------------------------------------------------- #
+      # BEiT.
+      # https://github.com/microsoft/unilm/blob/master/beit/modeling_finetune.py
+      # https://arxiv.org/pdf/2106.08254.pdf
+      # ------------------------------------------------------------- #
+      BEIT:
+        IMAGE_SIZE: 224
+        PATCH_SIZE: 16
+        NUM_LAYERS: 12
+        NUM_HEADS: 12
+        HIDDEN_DIM: 768
+        MLP_RATIO: 4.0
+        # MLP and projection layer dropout rate
+        DROPOUT_RATE: 0
+        # Attention dropout rate
+        ATTENTION_DROPOUT_RATE: 0
+        # Stochastic depth dropout rate. Turning on stochastic depth and
+        # using aggressive augmentation is essentially the difference
+        # between a DeiT and a ViT.
+        DROP_PATH_RATE: 0
+        QKV_BIAS: False # Bias for QKV in attention layers.
+        QK_SCALE: False # Scale
+        USE_ABS_POS_EMB: True
+        USE_REL_POS_BIAS: False
+        USE_SHARED_REL_POS_BIAS: False
+        USE_MEAN_POOLING: True
+        INIT_VALUES: False
 
       # ------------------------------------------------------------- #
       # Parameters unique to the ConViT and not used for standard vision
@@ -784,8 +832,8 @@ config:
     # ----------------------------------------------------------------------------------- #
     AMP_PARAMS:
       USE_AMP: False
-      # Use O1 as it is robust and stable than O3. If you want to use O3, we recommend
-      # the following setting:
+      # Only applicable for Apex AMP_TYPE.
+      # Use O1 as it is robust and stable than O3. If you want to use O3, we recommend the following setting:
       # {"opt_level": "O3", "keep_batchnorm_fp32": True, "master_weights": True, "loss_scale": "dynamic"}
       AMP_ARGS: {"opt_level": "O1"}
       # we support pytorch amp as well which is availale in pytorch>=1.6.
@@ -1126,7 +1174,10 @@ config:
     #   as soon as they are computed (accumulate none in memory)
     # - if set to -1, the extract_engine engine will dump features
     #   at the very end (accumulate all in memory)
-    CHUNK_THRESHOLD: 0
+    CHUNK_THRESHOLD: -1
+    # if user wants to save the extracted features as img_filename.npy
+    # we simply save the features that way
+    MAP_FEATURES_TO_IMG_NAME: False
 
   # ----------------------------------------------------------------------------------- #
   # CLUSTERFIT APPROACH (https://arxiv.org/abs/1912.03330)
@@ -1158,6 +1209,21 @@ config:
       # * if 0, dimensionality reduction is disabled
       # * if > 0, define the number of target dimensions of PCA
       DIMENSIONALITY_REDUCTION: 0
+
+  # ----------------------------------------------------------------------------------- #
+  # Ranking features using faiss
+  # ----------------------------------------------------------------------------------- #
+  RANKING:
+    USE_GPU: False
+    # currently we only support faiss backend ranking.
+    RANKING_BACKEND: "faiss"
+    NORMALIZE_FEATS: True
+    APPLY_PCA: False
+    PCA_DIM: 128
+    FEATURES:
+      DATA_PARTITION: "TRAIN"
+      DATASET_NAME: ""
+      LAYER_NAME: ""
 
   # ----------------------------------------------------------------------------------- #
   # TRAINER (define your train step)
@@ -1319,6 +1385,9 @@ config:
       # low shot values to consider. k=2 means 2 positives for a class and 2 negative from every
       # remaining class
       k_values: [1, 2, 4, 8, 16, 32, 64, 96]
+  # If empty, SVM will run extract features and run SVM on these
+  # If not empty, SVM will use the path to find the features
+  SVM_FEATURES_PATH: ""
 
   # ----------------------------------------------------------------------------------- #
   # INSTANCE RETRIEVAL (benchmark)
@@ -1369,6 +1438,7 @@ config:
     # Whether or not to apply L2 norm after the features have been post-processed.
     # Normalization is heavily recommended based on experiments run.
     NORMALIZE_FEATURES: True
+    CENTER_CROP: False
     ######################## Misc #######################
     # Whether or not to save the retrieval ranking scores (metrics, rankings, similarity scores)
     SAVE_RETRIEVAL_RANKINGS_SCORES: True
@@ -1386,3 +1456,23 @@ config:
     TOPK: 200
     # if the features should be l2 normalized, set this to True
     L2_NORM_FEATS: False
+    # whether or not to store the features on GPU
+    USE_CUDA: True
+    # whether or not to use the implementation with low memory usage
+    OPTIMIZE_MEMORY: False
+    # Where to find the extracted features and whether or not we should extract them
+    FEATURES:
+      # If empty, will run the extract features, if not, use the path to find the features
+      PATH: ""
+
+  # ----------------------------------------------------------------------------------- #
+  # Geo Localization (benchmark)
+  # ----------------------------------------------------------------------------------- #
+  GEO_LOCALIZATION:
+    # Benchmark Details:
+    #   Step1: Take a model and extract the model label predictions on test data.
+    #   Step2: Find the corresponding latitude/longitude predictions using the json mapping for train set.
+    #   Step3: find the ground truth latitute/longitude and compute the metric following the code.
+    TRAIN_LABEL_MAPPING: "/path/to/.json"
+    # [1, 25, 200, 750, 2500] -> [street, city, region, country, continent]
+    ACC_KM_THRESHOLDS: [1, 25, 200, 750, 2500]
