@@ -21,6 +21,8 @@ from vissl.utils.slurm import is_submitit_available
 
 from vissl.data.dataset_catalog import VisslDatasetCatalog
 
+import models.visslmodels as visslmodels
+
 VisslDatasetCatalog.register_data(
     name="danbooru2020",
     data_dict={
