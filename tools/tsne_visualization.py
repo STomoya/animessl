@@ -21,7 +21,7 @@ from PIL import Image
 import torchvision.transforms.functional as TF
 
 # loading model
-from inference_model import get_trained_model
+from tools.inference_model import get_trained_model
 import torch
 import torch.nn as nn
 import torchvision.models as models
@@ -64,7 +64,7 @@ def prepair_model(args):
             logger.warning('Both "--weights" and "--train-config" is required.')
             logger.warning('Aborting.')
             sys.exit(1)
-        logger.info(f'[Files for building the model] train_config : {args.train_config}, weights : {args.weights}')
+        logger.info(f'[Files for building the model]\ntrain_config : {args.train_config}\nweights : {args.weights}')
         resnet50 = get_trained_model(
             args.train_config, args.weights)
     return resnet50

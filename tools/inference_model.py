@@ -5,6 +5,8 @@ from vissl.models import build_model
 from classy_vision.generic.util import load_checkpoint
 from vissl.utils.checkpoint import init_model_from_consolidated_weights
 
+import models.visslmodels as visslmodels
+
 def get_trained_model(
     train_config: str,
     model_weights: str
