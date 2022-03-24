@@ -79,7 +79,7 @@ config:
         weight_decay: 0.000001
         momentum: 0.9
         nesterov: False
-        num_epochs: 100
+      num_epochs: 100
       # num_epochs: 200
       # num_epochs: 400
       # num_epochs: 500
