@@ -26,6 +26,11 @@ import models.visslmodels as visslmodels
 VisslDatasetCatalog.register_data(
     name="danbooru2020",
     data_dict={
+        "train": ['/home/vissluser/workspace/filelists/train_filelist-danbooru2020.npy', '<unused>'] ,
+        "test": ['/home/vissluser/workspace/filelists/test_filelist-danbooru2020.npy', '<unused>']})
+VisslDatasetCatalog.register_data(
+    name="danbooru2021",
+    data_dict={
         "train": ['/home/vissluser/workspace/filelists/train_filelist.npy', '<unused>'] ,
         "test": ['/home/vissluser/workspace/filelists/test_filelist.npy', '<unused>']})
 

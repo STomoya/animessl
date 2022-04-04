@@ -12,19 +12,19 @@ Training vision models with vissl + illustrated images.
 
 ## Dataset
 
-- Danbooru2020 (Planning to update to Danbooru2021)
+- Danbooru2021
 
     ```
-    @misc{danbooru2020,
+    @misc{danbooru2021,
         author = {Anonymous and Danbooru community and Gwern Branwen},
-        title = {Danbooru2020: A Large-Scale Crowdsourced and Tagged Anime Illustration Dataset},
-        howpublished = {\url{https://www.gwern.net/Danbooru2020}},
-        url = {https://www.gwern.net/Danbooru2020},
+        title = {Danbooru2021: A Large-Scale Crowdsourced and Tagged Anime Illustration Dataset},
+        howpublished = {\url{https://www.gwern.net/Danbooru2021}},
+        url = {https://www.gwern.net/Danbooru2021},
         type = {dataset},
-        year = {2021},
+        year = {2022},
         month = {January},
-        timestamp = {2021-01-12},
-        note = {Accessed: 2022/02/26} }
+        timestamp = {2022-01-21},
+        note = {Accessed: 2022-04-04} }
     ```
 
 ## Author
