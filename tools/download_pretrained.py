@@ -36,6 +36,7 @@ PRETRAINED.OUTPUT_FOLDER = './weights'
 PRETRAINED.MODELS = EasyDict()
 PRETRAINED.MODELS.SIMCLR_RESNET50 = _add_model('simclr_resnet50', '1bGKrxM_ciCgMKsrRfKQ1lDsx84Xc_tON')
 PRETRAINED.MODELS.SWAV_RESNET50   = _add_model('swav_resnet50',   '1rDpfwc7gLUb2BQEJ_oWygVph2tszh-xk')
+PRETRAINED.MODELS.SIMCLR_CONVNEXT = _add_model('simclr_convnext', '1hMO_63Sz0ZIeSR6I9onmU71aYDNxZWXK')
 
 all_models = [key.lower() for key in PRETRAINED.MODELS.keys()]
 
