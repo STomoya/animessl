@@ -7,8 +7,10 @@ Training vision models with vissl + illustrated images.
 
 |model|SSL|config file|
 |-|-|-|
+|ResNet50|MoCo|[`./configs/config/moco_resnet.yaml`](./configs/config/moco_resnet.yaml)|
 |ResNet50|SimCLR|[`./configs/config/simclr_resnet.yaml`](./configs/config/simclr_resnet.yaml)|
 |ResNet50|SwAV|[`./configs/config/swav_resnet.yaml`](./configs/config/swav_resnet.yaml)
+|ConvNeXt|SimCLR|[`./configs/config/simclr_convnext.yaml`](./configs/config/simclr_convnext.yaml)|
 
 ## Dataset
 
