@@ -12,7 +12,7 @@ from vissl.models.trunks import register_model_trunk
 
 from models.torchmodels.convnext import ConvNeXt
 
-@register_model_trunk('convnext')
+@register_model_trunk('animessl_convnext')
 class ConvNeXt(ConvNeXt):
     def __init__(self, model_config: AttrDict, model_name: str):
         self.model_config = model_config

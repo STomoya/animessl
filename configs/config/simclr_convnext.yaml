@@ -45,7 +45,7 @@ config:
     name: ""
   MODEL:
     TRUNK:
-      NAME: convnext
+      NAME: animessl_convnext
       CONVNEXT:
         DEPTHS: [3, 3, 9, 3]
         DIMS: [96, 192, 384, 768]

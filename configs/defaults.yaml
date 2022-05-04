@@ -91,6 +91,19 @@ config:
     # Whether or not to check if the loss or model_output is NaN.
     # ----------------------------------------------------------------------------------- #
     CHECK_NAN: True
+    EMA_MODEL:
+      # Save an exponential moving average of the model weights.
+      SAVE_EMA_MODEL: False
+      # Calculate the meters for the model.
+      ENABLE_EMA_METERS: False
+      # after how many iterations should you update the EMA.
+      UPDATE_ITER: 1
+      # Decimal after what percent of the training to start the EMA. Defaults is 0.05 or 5%.
+      WARMUP: 0.05
+      # decay to use for the exponential moving average.
+      DECAY: 0.9999
+      # device to put EMA model on: gpu | cpu.
+      EMA_DEVICE: gpu
 
     # ----------------------------------------------------------------------------------- #
     # Perf hooks for several steps of model training
@@ -682,6 +695,11 @@ config:
         DROP_PATH_RATE: 0
         QKV_BIAS: False # Bias for QKV in attention layers.
         QK_SCALE: False # Scale
+        # Optimisation tricks:
+        # * CHECKPOINT_MLP allows to checkpoint each MLP in blocks
+        # * CHECKPOINT_BLOCKS will checkpoint the entire block instead
+        CHECKPOINT_MLP: False
+        CHECKPOINT_BLOCK: False
 
       # ------------------------------------------------------------- #
       # XCiT (https://arxiv.org/abs/2106.09681)
@@ -701,6 +719,30 @@ config:
         ETA: 1
         TOKENS_NORM: True
         QKV_BIAS: True # Bias for QKV in attention layers.
+        QK_SCALE: False # Scale
+        CHECKPOINT_XCA_BLOCK: False
+        CHECKPOINT_ATTN_BLOCK: False
+
+      # ------------------------------------------------------------- #
+      # Swin-Transformer parameters
+      # https://arxiv.org/abs/2103.14030
+      # These default parameters correspond to the SwinT-Tiny variant
+      # ------------------------------------------------------------- #
+      SWIN_TRANSFORMER:
+        name:
+        IMAGE_SIZE: 224
+        PATCH_SIZE: 4
+        EMBED_DIM: 96
+        DEPTHS: [2, 2, 6, 2]
+        NUM_HEADS: [3, 6, 12, 24]
+        WINDOW_SIZE: 7
+        MLP_RATIO: 4.0
+        # MLP and projection layer dropout rate
+        DROPOUT_RATE: 0
+        # Attention dropout rate
+        ATTENTION_DROPOUT_RATE: 0
+        DROP_PATH_RATE: 0.1
+        QKV_BIAS: True
         QK_SCALE: False # Scale
 
       # ------------------------------------------------------------- #
@@ -730,6 +772,15 @@ config:
         USE_SHARED_REL_POS_BIAS: False
         USE_MEAN_POOLING: True
         INIT_VALUES: False
+
+      # ------------------------------------------------------------- #
+      # Parameters unique to the ConvNext
+      # https://arxiv.org/pdf/2201.03545.pdf
+      # -------------------------------------------------------------
+      CONVNEXT:
+        DEPTH: [3, 3, 27, 3]
+        DIMS: [96, 192, 384, 768]
+        DROP_PATH_RATE: 0.0
 
       # ------------------------------------------------------------- #
       # Parameters unique to the ConViT and not used for standard vision
@@ -1021,7 +1072,6 @@ config:
       teacher_temp_warmup_iters: 37500 # 30 epochs
       crops_for_teacher: [0, 1]
       ema_center: 0.9
-      normalize_last_layer: true
       output_dim: 65536  # automatically inferred from model HEAD settings
 
     # -----------------------------------------------------------------------------------#
@@ -1161,6 +1211,9 @@ config:
     # is wrapped by FSDP with flattening, individual parameters inside the model are
     # replaced with a flattened parameter. Therefore, this option is needed in that case.
     construct_single_param_group_only: False
+    # Under certain cases, we want to specify a customized way to create the parameter
+    # groups. The following allows you to register a param group constructor by name
+    param_group_constructor: 'default'
 
   # ----------------------------------------------------------------------------------- #
   # Options specific to the "extract_feature" engine
@@ -1438,13 +1491,17 @@ config:
     # Whether or not to apply L2 norm after the features have been post-processed.
     # Normalization is heavily recommended based on experiments run.
     NORMALIZE_FEATURES: True
+    # Whether or not to center crop the image.
     CENTER_CROP: False
     ######################## Misc #######################
     # Whether or not to save the retrieval ranking scores (metrics, rankings, similarity scores)
     SAVE_RETRIEVAL_RANKINGS_SCORES: True
     # Whether or not to save the features that were extracted
     SAVE_FEATURES: False
-
+    # Whether or not to use the features extraction engine.
+    USE_FEATURE_EXTRACTION_ENGINE: False
+    # If a non-empty string, directly loads the features extracted from the feature extraction engine.
+    FEATURE_EXTRACTION_DIR: ""
 
   # ----------------------------------------------------------------------------------- #
   # K-NEAREST NEIGHBOR (benchmark)
